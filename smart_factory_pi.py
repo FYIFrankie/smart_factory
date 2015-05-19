@@ -102,12 +102,12 @@ def log(args, values, base_url, remote_addr):
 def favicon():
 	return '0'
 
-@app.route('/log', methods=['OPTIONS'])
+@app.route('/log', methods=['GET', 'OPTIONS'])
 @crossdomain(origin='*')
 def log_route():
 	return send_file('log_file.txt')
 
-@app.route('/help', methods=['OPTIONS'])
+@app.route('/help', methods=['GET', 'OPTIONS'])
 @crossdomain(origin='*')
 def help_route():
 	return send_file('help.txt')
@@ -117,10 +117,73 @@ def page_not_found(e):
 	log(request.args, request.values, request.base_url, request.remote_addr)
 	return 'Your route is incorrect'
 
+@app.route('/append', methods=['GET', 'OPTIONS'])
+@crossdomain(origin='*')
+def append_route():
+	global group_data
+
+	log(request.args, request.values, request.base_url, request.remote_addr)
+	try:
+		key = request.args['key']
+	except KeyError:
+		return "Params don't contain key. Example: {'key': 'example_key',...}"
+	try:
+		value = request.args['value']
+	except KeyError:
+		return "Params don't contain value. Example: {'value': ['t1', 'fire']...}"
+
+	for item in group_data:
+		if item['key'] == key:
+			if value in item['value']:
+				return (key + ' aleady contains ' + value)
+			else:
+				item['value'].append(value)
+				write_out()
+				try:
+					on_store.main(group_data, store_data)
+				except:
+					print("An error has occured in the student script")
+				try:
+					evil_script.main(group_data, store_data)
+				except:
+					print("An error has occured in the evil script")
+				return (value + ' succesfully added to ' + key)
+	return 'Key '+ key + ' is not in data'
+
+
+
+@app.route('/remove', methods=['GET', 'OPTIONS'])
+@crossdomain(origin='*')
+def remove_route():
+	global group_data
+
+	log(request.args, request.values, request.base_url, request.remote_addr)
+	try:
+		key = request.args['key']
+	except KeyError:
+		return "Params don't contain key. Example: {'key': 'example_key',...}"
+	try:
+		value = request.args['value']
+	except KeyError:
+		return "Params don't contain value. Example: {'value': ['t1', 'fire']...}"
+
+	for item in group_data:
+		if item['key'] == key:
+			if value not in item['value']:
+				return (key + ' does not contain ' + value)
+			else:
+				item['value'].remove(value)
+				write_out()
+				return (value + ' succesfully removed from ' + key)
+	return 'Key '+ key + ' is not in data'
+
+
+
+
 @app.route('/retrieve', methods= ['GET', 'OPTIONS'])
 @crossdomain(origin='*')
 def retrieve_route():
-	time.sleep(1)
+
 	global group_data
 
 	log(request.args, request.values, request.base_url, request.remote_addr)
@@ -144,7 +207,6 @@ def retrieve_route():
 @app.route('/store', methods= ['GET', 'OPTIONS'])
 @crossdomain(origin='*')
 def store_route():
-	time.sleep(1)
 	global group_data
 
 	log(request.args, request.values, request.base_url, request.remote_addr)

@@ -5,6 +5,23 @@ except ImportError:
 
 IP_ADDRESS = 'localhost'
 
+def append(q, item):
+	if type(q) is not str:
+		return "First paramter must be string"
+	if type(item) is not str:
+		return "Second paramter must be string"
+	r = requests.get("http://" + IP_ADDRESS + ":5000/append", params={'key': q, 'value': item})
+	return (str(r.text))
+
+def remove(q, item):
+	if type(q) is not str:
+		return "First paramter must be string"
+	if type(item) is not str:
+		return "Second paramter must be string"
+	r = requests.get("http://" + IP_ADDRESS + ":5000/remove", params={'key': q, 'value': item})
+	return (str(r.text))
+
+
 def store(payload):
 	r = requests.get("http://" + IP_ADDRESS + ":5000/store", params=payload)
 	return (str(r.text))
