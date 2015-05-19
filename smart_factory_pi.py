@@ -230,7 +230,7 @@ def store_route():
 			except:
 				print("An error has occured in the student script")
 			try:
-				evil_scropt.main(group_data,store_data )
+				evil_script.main(group_data,store_data )
 			except:
 				print("An error has occured in the evil script")
 			return ('Successfully updated ' + key +  ' to value ' + str([str(x) for x in value]))
