@@ -130,7 +130,7 @@ def append_route():
 	try:
 		value = request.args['value']
 	except KeyError:
-		return "Params don't contain value. Example: {'value': ['t1', 'fire']...}"
+		return "Params don't contain value. Example: {'value': 'truck1'}"
 
 	for item in group_data:
 		if item['key'] == key:
@@ -165,7 +165,7 @@ def remove_route():
 	try:
 		value = request.args['value']
 	except KeyError:
-		return "Params don't contain value. Example: {'value': ['t1', 'fire']...}"
+		return "Params don't contain value. Example: {'value': 'truck1'}"
 
 	for item in group_data:
 		if item['key'] == key:

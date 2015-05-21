@@ -5,20 +5,16 @@ except ImportError:
 
 IP_ADDRESS = 'localhost'
 
-def append(q, item):
-	if type(q) is not str:
-		return "First paramter must be string"
-	if type(item) is not str:
-		return "Second paramter must be string"
-	r = requests.get("http://" + IP_ADDRESS + ":5000/append", params={'key': q, 'value': item})
+def append(item):
+	if type(item) is not dict:
+		return "Your parameter must be a dictionary with key and value"
+	r = requests.get("http://" + IP_ADDRESS + ":5000/append", params={'key': item['key'], 'value': item['value']})
 	return (str(r.text))
 
-def remove(q, item):
-	if type(q) is not str:
-		return "First paramter must be string"
-	if type(item) is not str:
-		return "Second paramter must be string"
-	r = requests.get("http://" + IP_ADDRESS + ":5000/remove", params={'key': q, 'value': item})
+def remove(item):
+	if type(item) is not dict:
+		return "Your parameter must be a dictionary with key and value"
+	r = requests.get("http://" + IP_ADDRESS + ":5000/remove", params={'key': item['key'], 'value': item['value']})
 	return (str(r.text))
 
 
