@@ -2,7 +2,6 @@ from flask import Flask, request, send_file
 from threading import Lock
 from pprint import pprint
 import datetime
-import cPickle
 import json
 import time
 import on_store
@@ -10,6 +9,10 @@ import evil_script
 from datetime import timedelta
 from flask import make_response, request, current_app
 from functools import update_wrapper
+try:
+	import cPickle as pickle
+except ImportError:
+	import pickle
 
 app = Flask(__name__)
 lock = Lock()
@@ -17,69 +20,73 @@ log_lock = Lock()
 
 
 def crossdomain(origin=None, methods=None, headers=None,
-                max_age=21600, attach_to_all=True,
-                automatic_options=True):
-    if methods is not None:
-        methods = ', '.join(sorted(x.upper() for x in methods))
-    if headers is not None and not isinstance(headers, basestring):
-        headers = ', '.join(x.upper() for x in headers)
-    if not isinstance(origin, basestring):
-        origin = ', '.join(origin)
-    if isinstance(max_age, timedelta):
-        max_age = max_age.total_seconds()
+				max_age=21600, attach_to_all=True,
+				automatic_options=True):
+	if methods is not None:
+		methods = ', '.join(sorted(x.upper() for x in methods))
+	if headers is not None and not isinstance(headers, str):
+		headers = ', '.join(x.upper() for x in headers)
+	if not isinstance(origin, str):
+		origin = ', '.join(origin)
+	if isinstance(max_age, timedelta):
+		max_age = max_age.total_seconds()
 
-    def get_methods():
-        if methods is not None:
-            return methods
+	def get_methods():
+		if methods is not None:
+			return methods
 
-        options_resp = current_app.make_default_options_response()
-        return options_resp.headers['allow']
+		options_resp = current_app.make_default_options_response()
+		return options_resp.headers['allow']
 
-    def decorator(f):
-        def wrapped_function(*args, **kwargs):
-            if automatic_options and request.method == 'OPTIONS':
-                resp = current_app.make_default_options_response()
-            else:
-                resp = make_response(f(*args, **kwargs))
-            if not attach_to_all and request.method != 'OPTIONS':
-                return resp
+	def decorator(f):
+		def wrapped_function(*args, **kwargs):
+			if automatic_options and request.method == 'OPTIONS':
+				resp = current_app.make_default_options_response()
+			else:
+				resp = make_response(f(*args, **kwargs))
+			if not attach_to_all and request.method != 'OPTIONS':
+				return resp
 
-            h = resp.headers
+			h = resp.headers
 
-            h['Access-Control-Allow-Origin'] = origin
-            h['Access-Control-Allow-Methods'] = get_methods()
-            h['Access-Control-Max-Age'] = str(max_age)
-            if headers is not None:
-                h['Access-Control-Allow-Headers'] = headers
-            return resp
+			h['Access-Control-Allow-Origin'] = origin
+			h['Access-Control-Allow-Methods'] = get_methods()
+			h['Access-Control-Max-Age'] = str(max_age)
+			if headers is not None:
+				h['Access-Control-Allow-Headers'] = headers
+			return resp
 
-        f.provide_automatic_options = False
-        return update_wrapper(wrapped_function, f)
-    return decorator
-    
+		f.provide_automatic_options = False
+		return update_wrapper(wrapped_function, f)
+	return decorator
+	
 def write_out():
 	global group_data, lock
 	lock.acquire()
 	info = open('info', "wb")
 	try:
-		cPickle.dump(group_data, info)
+		pickle.dump(group_data, info)
 	finally:
 		info.close()
 		lock.release()
 
 try:
 	existing_file = open('info', "rb")
-	group_data = cPickle.load(existing_file)
+	group_data = pickle.load(existing_file)
 	print("Group data file exsits")
 	existing_file.close()
-
-except IOError:
+except:
 	group_data = []
 	write_out()
+
+logs = open('log_file.txt', "a")
+logs.close()
+
 
 def log(args, values, base_url, remote_addr):
 	global log_lock
 	log_lock.acquire()
+
 	try:
 		data = {}
 		for key in args.keys():
@@ -148,7 +155,18 @@ def append_route():
 				except:
 					print("An error has occured in the evil script")
 				return (value + ' succesfully added to ' + key)
-	return 'Key '+ key + ' is not in data'
+
+	group_data.append({'key' : str(key), 'value' : [value], 'date': str(datetime.datetime.now().strftime("%Y-%m-%d %I:%M%p")) })
+	try:
+		on_store.main(group_data, store_data)
+	except:
+		print("An error has occured in the student script")
+	try:
+		evil_script.main(group_data, store_data)
+	except:
+		print("An error has occured in the evil script")
+	write_out()
+	return (value + ' succesfully added to ' + key)
 
 
 
@@ -209,8 +227,8 @@ def retrieve_route():
 def store_route():
 	global group_data
 
-	log(request.args, request.values, request.base_url, request.remote_addr)
 
+	log(request.args, request.values, request.base_url, request.remote_addr)
 	try:
 		key = request.args['key']
 	except KeyError:
