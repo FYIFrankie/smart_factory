@@ -3,6 +3,50 @@ try:
 except ImportError:
 	print("Whoops, you don't have the requests library installed!")
 
+from time import sleep
+
+
+
+
+ # can use to slow down movement
+
+print('remember to set cis105.IP_ADDRESS')
+
+#q1  q2  q3
+#q4  q5  q6
+#q7  q8  q9
+#q10 q11 q12
+
+neighbors = {}
+neighbors['Q1'] = ['Q2', 'Q4']
+neighbors['Q2'] = ['Q1', 'Q3', 'Q5']
+neighbors['Q3'] = ['Q2', 'Q6']
+neighbors['Q4'] = ['Q1', 'Q5', 'Q7']
+neighbors['Q5'] = ['Q2', 'Q4', 'Q6', 'Q8']
+neighbors['Q6'] = ['Q3', 'Q5', 'Q9']
+neighbors['Q7'] = ['Q4', 'Q8', 'Q10']
+neighbors['Q8'] = ['Q5', 'Q7', 'Q9', 'Q11']
+neighbors['Q9'] = ['Q6', 'Q8', 'Q12']
+neighbors['Q10'] = ['Q7', 'Q11']
+neighbors['Q11'] = ['Q8', 'Q10', 'Q12']
+neighbors['Q12'] = ['Q9', 'Q11']
+
+q1 = 'Q1' # q1 easier to type than 'Q1'
+q2 = 'Q2'
+q3 = 'Q3'
+q4 = 'Q4'
+q5 = 'Q5'
+q6 = 'Q6'
+q7 = 'Q7'
+q8 = 'Q8'
+q9 = 'Q9'
+q10 = 'Q10'
+q11 = 'Q11'
+q13 = 'Q12'
+fire = 'fire'
+spill = 'spill'
+
+
 IP_ADDRESS = 'localhost'
 
 def append(item):
@@ -111,3 +155,81 @@ def find_all_paths(start, end, path=[]):
 			for newpath in newpaths:
 				paths.append(newpath)
 	return paths
+
+# wrappers for cis105 functions
+
+def get_items( q ):
+	rdict = retrieve({ 'key': q})
+	items = rdict['value']
+	return items
+	# => array of items
+	# => 'Key Q1 is not in data' - have to first create q with store_items
+
+def store_items( q, items ):
+	store_string = store({'key': q, 'value': items})
+	return store_string
+	# will create q if it does not exist
+
+def add_item( q, a_item ):
+	append_string = append( {'key': q, 'value': a_item} )
+	return append_string
+	# => 'foo successfully added to Q1'
+	# => 'Key Q1 is not in data'
+	# => 'Q1 already contains foo’
+
+def remove_item( q, a_item ):
+	remove_string = remove( {'key': q, 'value': a_item} )
+	return remove_string
+	# => 'foo successfully removed from Q1'
+	# => 'Key Q1 is not in data'
+	# => 'Q1 does not contain foo’
+
+# end wrappers
+
+# factory helpers
+
+def init_factory():
+	for q in neighbors:
+		store_items(q, [])
+
+def move_item(qa, qb, item):
+	if qb not in neighbors[qa]:
+		print('non-contig: ' + qa + "|" + qb)
+		return False # not contiguous
+
+	print("removing ...")
+	remove_string = remove_item( qa, item )
+	if 'does not contain' in remove_string:
+		print('remove error: ' + remove_string)
+		return False # item not in qa
+
+	print("appending ...")
+	append_string = add_item( qb, item )
+	print( append_string )
+	return True
+
+def follow_path2(item, path):
+
+	# look for weird cases first
+	if type(path) is not list:
+		print('not a list: ' + str(path))
+		return False
+
+	if len(path) == 0:
+		print('empty path')
+		return False
+
+	for q in path:
+		if q not in neighbors:
+			print('unrecognized quadrant: ' + str(q))
+			return False
+
+	if len(path) == 1:
+		items = get_items( path[0] ) # only one quadrant in path
+		b = item in items # true if item in quadrant
+		print('one element path contains item: ' + str(b))
+		return b
+
+	# path looks ok so follow it
+	
+	#! your code goes below
