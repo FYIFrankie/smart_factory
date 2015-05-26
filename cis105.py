@@ -91,7 +91,7 @@ def drop_off_cargo(truck, q):
 	if full_name == '':
 		print(truck + ' not in ' + q)
 		return False
-	if cargo not in full_name:
+	if 'cargo' not in full_name:
 		print('cargo not on truck ' + truck)
 		return False
 	pieces = full_name.split('-')
