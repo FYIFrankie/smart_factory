@@ -3,14 +3,60 @@ try:
 except ImportError:
 	print("Whoops, you don't have the requests library installed!")
 
-from time import sleep
+IP_ADDRESS = 'localhost'
+
+def raw_append(item):
+	if type(item) is not dict:
+		return "Your parameter must be a dictionary with key and value"
+	r = requests.get("http://" + IP_ADDRESS + ":5000/append", params={'key': item['key'], 'value': item['value']})
+	return (str(r.text))
+
+def raw_remove(item):
+	if type(item) is not dict:
+		return "Your parameter must be a dictionary with key and value"
+	r = requests.get("http://" + IP_ADDRESS + ":5000/remove", params={'key': item['key'], 'value': item['value']})
+	return (str(r.text))
+
+
+def raw_store(payload):
+	r = requests.get("http://" + IP_ADDRESS + ":5000/store", params=payload)
+	return (str(r.text))
+
+
+def raw_parse_dict(dict_obj):
+	temp_dict = {}
+	for k, v in dict_obj.items():
+		try:
+			a = [str(x) for x in eval(str(v))]	
+			temp_dict[str(k)] = a
+		except (SyntaxError, NameError):
+			temp_dict[str(k)] = str(v)
+	return temp_dict
 
 
 
+def raw_retrieve(payload):
+	r = requests.get("http://" + IP_ADDRESS + ":5000/retrieve", params=payload)
+	array = []
+	try:
+		r.json()
+	except ValueError:
+		return str(r.text)
 
- # can use to slow down movement
+	if type(r.json()) is list:
+		array = []
+		for item in r.json():
+			array.append(raw_parse_dict(item))
+		return array
+	else:
+		return raw_parse_dict(r.json())
 
-print('remember to set cis105.IP_ADDRESS')
+
+def raw_clear_key(payload):
+	r = requests.get("http://" + IP_ADDRESS + ":5000/clear_key", params=payload)
+	return (str(r.text))
+
+# end raw functions
 
 #q1  q2  q3
 #q4  q5  q6
@@ -46,59 +92,53 @@ q13 = 'Q12'
 fire = 'fire'
 spill = 'spill'
 
+# wrappers for cis105 functions
 
-IP_ADDRESS = 'localhost'
+def get_items( q ):
+	rdict = raw_retrieve({ 'key': q})
+	items = rdict['value']
+	return items
+	# => array of items
+	# => 'Key Q1 is not in data' - have to first create q with store_items
 
-def append(item):
-	if type(item) is not dict:
-		return "Your parameter must be a dictionary with key and value"
-	r = requests.get("http://" + IP_ADDRESS + ":5000/append", params={'key': item['key'], 'value': item['value']})
-	return (str(r.text))
+def store_items( q, items ):
+	store_string = raw_store({'key': q, 'value': items})
+	return store_string
+	# will create q if it does not exist
 
-def remove(item):
-	if type(item) is not dict:
-		return "Your parameter must be a dictionary with key and value"
-	r = requests.get("http://" + IP_ADDRESS + ":5000/remove", params={'key': item['key'], 'value': item['value']})
-	return (str(r.text))
+def add_item( q, a_item ):
+	append_string = raw_append( {'key': q, 'value': a_item} )
+	return append_string
 
+def remove_item( q, a_item ):
+	remove_string = raw_remove( {'key': q, 'value': a_item} )
+	return remove_string
+	# => 'foo successfully removed from Q1'
+	# => 'Key Q1 is not in data'
 
-def store(payload):
-	r = requests.get("http://" + IP_ADDRESS + ":5000/store", params=payload)
-	return (str(r.text))
+# end wrappers
 
+# factory helpers
 
-def parse_dict(dict_obj):
-	temp_dict = {}
-	for k, v in dict_obj.items():
-		try:
-			a = [str(x) for x in eval(str(v))]	
-			temp_dict[str(k)] = a
-		except (SyntaxError, NameError):
-			temp_dict[str(k)] = str(v)
-	return temp_dict
+def init_factory():
+	for q in neighbors:
+		store_items(q, [])
 
+def move_item(qa, qb, item):
+	if qb not in neighbors[qa]:
+		print('non-contig: ' + qa + "|" + qb)
+		return False # not contiguous
 
+	print("removing ...")
+	remove_string = remove_item( qa, item )
+	if 'does not contain' in remove_string:
+		print('remove error: ' + remove_string)
+		return False # item not in qa
 
-def retrieve(payload):
-	r = requests.get("http://" + IP_ADDRESS + ":5000/retrieve", params=payload)
-	array = []
-	try:
-		r.json()
-	except ValueError:
-		return str(r.text)
-
-	if type(r.json()) is list:
-		array = []
-		for item in r.json():
-			array.append(parse_dict(item))
-		return array
-	else:
-		return parse_dict(r.json())
-
-
-def clear_key(payload):
-	r = requests.get("http://" + IP_ADDRESS + ":5000/clear_key", params=payload)
-	return (str(r.text))
+	print("appending ...")
+	append_string = add_item( qb, item )
+	print( append_string )
+	return True
 
 def get_item_color( item ):
 	i = item.find('_')
@@ -155,81 +195,3 @@ def find_all_paths(start, end, path=[]):
 			for newpath in newpaths:
 				paths.append(newpath)
 	return paths
-
-# wrappers for cis105 functions
-
-def get_items( q ):
-	rdict = retrieve({ 'key': q})
-	items = rdict['value']
-	return items
-	# => array of items
-	# => 'Key Q1 is not in data' - have to first create q with store_items
-
-def store_items( q, items ):
-	store_string = store({'key': q, 'value': items})
-	return store_string
-	# will create q if it does not exist
-
-def add_item( q, a_item ):
-	append_string = append( {'key': q, 'value': a_item} )
-	return append_string
-	# => 'foo successfully added to Q1'
-	# => 'Key Q1 is not in data'
-	# => 'Q1 already contains foo’
-
-def remove_item( q, a_item ):
-	remove_string = remove( {'key': q, 'value': a_item} )
-	return remove_string
-	# => 'foo successfully removed from Q1'
-	# => 'Key Q1 is not in data'
-	# => 'Q1 does not contain foo’
-
-# end wrappers
-
-# factory helpers
-
-def init_factory():
-	for q in neighbors:
-		store_items(q, [])
-
-def move_item(qa, qb, item):
-	if qb not in neighbors[qa]:
-		print('non-contig: ' + qa + "|" + qb)
-		return False # not contiguous
-
-	print("removing ...")
-	remove_string = remove_item( qa, item )
-	if 'does not contain' in remove_string:
-		print('remove error: ' + remove_string)
-		return False # item not in qa
-
-	print("appending ...")
-	append_string = add_item( qb, item )
-	print( append_string )
-	return True
-
-def follow_path2(item, path):
-
-	# look for weird cases first
-	if type(path) is not list:
-		print('not a list: ' + str(path))
-		return False
-
-	if len(path) == 0:
-		print('empty path')
-		return False
-
-	for q in path:
-		if q not in neighbors:
-			print('unrecognized quadrant: ' + str(q))
-			return False
-
-	if len(path) == 1:
-		items = get_items( path[0] ) # only one quadrant in path
-		b = item in items # true if item in quadrant
-		print('one element path contains item: ' + str(b))
-		return b
-
-	# path looks ok so follow it
-	
-	#! your code goes below
