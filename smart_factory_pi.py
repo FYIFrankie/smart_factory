@@ -142,31 +142,31 @@ def append_route():
 	for item in group_data:
 		if item['key'] == key:
 			if value in item['value']:
-				return (key + ' aleady contains ' + value)
+				return (key + ' already contains ' + value)
 			else:
 				item['value'].append(value)
 				write_out()
 				try:
 					on_store.main(group_data, store_data)
 				except:
-					print("An error has occured in the student script")
+					print("An error has occurred in the student script")
 				try:
 					evil_script.main(group_data, store_data)
 				except:
-					print("An error has occured in the evil script")
-				return (value + ' succesfully added to ' + key)
+					print("An error has occurred in the evil script")
+				return (value + ' successfully added to ' + key)
 
 	group_data.append({'key' : str(key), 'value' : [value], 'date': str(datetime.datetime.now().strftime("%Y-%m-%d %I:%M%p")) })
 	try:
 		on_store.main(group_data, store_data)
 	except:
-		print("An error has occured in the student script")
+		print("An error has occurred in the student script")
 	try:
 		evil_script.main(group_data, store_data)
 	except:
-		print("An error has occured in the evil script")
+		print("An error has occurred in the evil script")
 	write_out()
-	return (value + ' succesfully added to ' + key)
+	return (value + ' successfully added to ' + key)
 
 
 
@@ -246,22 +246,22 @@ def store_route():
 			try:
 				on_store.main(group_data, store_data)
 			except:
-				print("An error has occured in the student script")
+				print("An error has occurred in the student script")
 			try:
 				evil_script.main(group_data,store_data )
 			except:
-				print("An error has occured in the evil script")
+				print("An error has occurred in the evil script")
 			return ('Successfully updated ' + key +  ' to value ' + str([str(x) for x in value]))
 
 	group_data.append({'key' : str(key), 'value' : value, 'date': str(datetime.datetime.now().strftime("%Y-%m-%d %I:%M%p")) })
 	try:
 		on_store.main(group_data, store_data)
 	except:
-		print("An error has occured in the student script")
+		print("An error has occurred in the student script")
 	try:
 		evil_script.main(group_data, store_data)
 	except:
-		print("An error has occured in the evil script")
+		print("An error has occurred in the evil script")
 	write_out()
 	return ('Successfully added ' + key +  ' with value ' + str([str(x) for x in value]))
 
