@@ -5,6 +5,9 @@ import datetime
 import json
 import time
 import on_store
+import red
+import blue
+import purple
 import evil_script
 from datetime import timedelta
 from flask import make_response, request, current_app
@@ -104,6 +107,28 @@ def log(args, values, base_url, remote_addr):
 		log_file.close()
 		log_lock.release()
 
+def try_scripts(group_data, store_data):
+	try:
+		on_store.main(group_data, store_data)
+	except:
+		print("An error has occurred in the student script")
+	try:
+		evil_script.main(group_data, store_data)
+	except:
+		print("An error has occurred in the evil script")
+	try:
+		red.main(group_data, store_data)
+	except:
+		print("An error has occurred in the red script")
+	try:
+		blue.main(group_data, store_data)
+	except:
+		print("An error has occurred in the blue script")
+	try:
+		purple.main(group_data, store_data)
+	except:
+		print("An error has occurred in the purple script")
+
 
 @app.route('/favicon.ico')
 def favicon():
@@ -138,7 +163,8 @@ def append_route():
 		value = request.args['value']
 	except KeyError:
 		return "Params don't contain value. Example: {'value': 'truck1'}"
-
+	store_data = {'key': key, 'value': value}
+	print("here")
 	for item in group_data:
 		if item['key'] == key:
 			if value in item['value']:
@@ -146,26 +172,12 @@ def append_route():
 			else:
 				item['value'].append(value)
 				write_out()
-				try:
-					on_store.main(group_data, store_data)
-				except:
-					print("An error has occurred in the student script")
-				try:
-					evil_script.main(group_data, store_data)
-				except:
-					print("An error has occurred in the evil script")
+				try_scripts(group_data, store_data)
 				return (value + ' successfully added to ' + key)
 
 	group_data.append({'key' : str(key), 'value' : [value], 'date': str(datetime.datetime.now().strftime("%Y-%m-%d %I:%M%p")) })
-	try:
-		on_store.main(group_data, store_data)
-	except:
-		print("An error has occurred in the student script")
-	try:
-		evil_script.main(group_data, store_data)
-	except:
-		print("An error has occurred in the evil script")
 	write_out()
+	try_scripts(group_data, store_data)
 	return (value + ' successfully added to ' + key)
 
 
