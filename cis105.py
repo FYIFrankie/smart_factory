@@ -3,7 +3,14 @@ try:
 except ImportError:
 	print("Whoops, you don't have the requests library installed!")
 
-IP_ADDRESS = 'localhost'
+__IP_ADDRESS = '192.168.0.100'
+
+def set_ip( val ):
+	global __IP_ADDRESS
+	__IP_ADDRESS = val
+
+def get_ip():
+	return __IP_ADDRESS
 
 def raw_append(item):
 	if type(item) is not dict:
