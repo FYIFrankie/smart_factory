@@ -96,7 +96,10 @@ spill = 'spill'
 
 def get_items( q ):
 	rdict = raw_retrieve({ 'key': q})
-	items = rdict['value']
+	if type(rdict) != str:
+		items = rdict['value']
+	else:
+		return rdict
 	return items
 	# => array of items
 	# => 'Key Q1 is not in data' - have to first create q with store_items

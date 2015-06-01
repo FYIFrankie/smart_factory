@@ -164,7 +164,7 @@ def append_route():
 	except KeyError:
 		return "Params don't contain value. Example: {'value': 'truck1'}"
 	store_data = {'key': key, 'value': value}
-	print("here")
+	
 	for item in group_data:
 		if item['key'] == key:
 			if value in item['value']:
@@ -229,7 +229,7 @@ def retrieve_route():
 		for item in group_data:
 			if item['key'] == key:
 				return json.dumps(item)
-		return ('Key is not stored in ' + ' data')
+		return ('Key is not stored in data')
 
 
 
