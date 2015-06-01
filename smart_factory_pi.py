@@ -222,7 +222,6 @@ def retrieve_route():
 		key = request.args['key']
 	except KeyError:
 		return "Params don't contain key. Example: {'key': 'example_key',...}"
-
 	data = []
 	if (key == '*group'):
 		return json.dumps(group_data)
@@ -230,7 +229,7 @@ def retrieve_route():
 		for item in group_data:
 			if item['key'] == key:
 				return json.dumps(item)
-		return ('Key is not stored in ' + group + ' data')
+		return ('Key is not stored in ' + ' data')
 
 
 
