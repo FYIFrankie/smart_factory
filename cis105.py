@@ -15,18 +15,18 @@ def get_ip():
 def raw_append(item):
 	if type(item) is not dict:
 		return "Your parameter must be a dictionary with key and value"
-	r = requests.get("http://" + IP_ADDRESS + ":5000/append", params={'key': item['key'], 'value': item['value']})
+	r = requests.get("http://" + __IP_ADDRESS + ":5000/append", params={'key': item['key'], 'value': item['value']})
 	return (str(r.text))
 
 def raw_remove(item):
 	if type(item) is not dict:
 		return "Your parameter must be a dictionary with key and value"
-	r = requests.get("http://" + IP_ADDRESS + ":5000/remove", params={'key': item['key'], 'value': item['value']})
+	r = requests.get("http://" + __IP_ADDRESS + ":5000/remove", params={'key': item['key'], 'value': item['value']})
 	return (str(r.text))
 
 
 def raw_store(payload):
-	r = requests.get("http://" + IP_ADDRESS + ":5000/store", params=payload)
+	r = requests.get("http://" + __IP_ADDRESS + ":5000/store", params=payload)
 	return (str(r.text))
 
 
@@ -43,7 +43,7 @@ def raw_parse_dict(dict_obj):
 
 
 def raw_retrieve(payload):
-	r = requests.get("http://" + IP_ADDRESS + ":5000/retrieve", params=payload)
+	r = requests.get("http://" + __IP_ADDRESS + ":5000/retrieve", params=payload)
 	array = []
 	try:
 		r.json()
@@ -60,7 +60,7 @@ def raw_retrieve(payload):
 
 
 def raw_clear_key(payload):
-	r = requests.get("http://" + IP_ADDRESS + ":5000/clear_key", params=payload)
+	r = requests.get("http://" + __IP_ADDRESS + ":5000/clear_key", params=payload)
 	return (str(r.text))
 
 # end raw functions
