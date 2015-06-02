@@ -40,8 +40,6 @@ def raw_parse_dict(dict_obj):
 			temp_dict[str(k)] = str(v)
 	return temp_dict
 
-
-
 def raw_retrieve(payload):
 	r = requests.get("http://" + __IP_ADDRESS + ":5000/retrieve", params=payload)
 	array = []
@@ -57,7 +55,6 @@ def raw_retrieve(payload):
 		return array
 	else:
 		return raw_parse_dict(r.json())
-
 
 def raw_clear_key(payload):
 	r = requests.get("http://" + __IP_ADDRESS + ":5000/clear_key", params=payload)
@@ -113,15 +110,18 @@ def get_items( q ):
 
 def store_items( q, items ):
 	store_string = raw_store({'key': q, 'value': items})
+	reset_cache()
 	return store_string
 	# will create q if it does not exist
 
 def add_item( q, a_item ):
 	append_string = raw_append( {'key': q, 'value': a_item} )
+	reset_cache()
 	return append_string
 
 def remove_item( q, a_item ):
 	remove_string = raw_remove( {'key': q, 'value': a_item} )
+	reset_cache()
 	return remove_string
 	# => 'foo successfully removed from Q1'
 	# => 'Key Q1 is not in data'
@@ -205,3 +205,25 @@ def find_all_paths(start, end, path=[]):
 			for newpath in newpaths:
 				paths.append(newpath)
 	return paths
+
+# Trying to speed things up with cache on laptop
+
+__cache = {} # {'Q1': ['fire'], 'Q2': [], ...}
+
+def reset_cache():
+	global __cache
+	clist = raw_retrieve({'key': '*group'})
+	cdict = {}
+	for element in clist:
+		cdict[element['key']] = element['value']
+	__cache = cdict
+
+def get_cache():
+	return __cache
+
+def fast_get_items(q):
+	if q in __cache:
+		return __cache[q]
+	print('not found: ' + q)
+	return None
+
