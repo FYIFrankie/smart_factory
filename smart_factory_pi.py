@@ -4,6 +4,7 @@ from pprint import pprint
 import datetime
 import json
 import time
+import datetime
 import on_store
 import red
 import blue
@@ -80,7 +81,7 @@ try:
 	existing_file.close()
 except:
 	group_data = []
-	write_out()
+	#write_out()
 
 logs = open('log_file.txt', "a")
 logs.close()
@@ -154,7 +155,7 @@ def page_not_found(e):
 def append_route():
 	global group_data
 
-	log(request.args, request.values, request.base_url, request.remote_addr)
+	#log(request.args, request.values, request.base_url, request.remote_addr)
 	try:
 		key = request.args['key']
 	except KeyError:
@@ -165,19 +166,22 @@ def append_route():
 		return "Params don't contain value. Example: {'value': 'truck1'}"
 	store_data = {'key': key, 'value': value}
 	
+	start = time.time()
 	for item in group_data:
 		if item['key'] == key:
 			if value in item['value']:
 				return (key + ' already contains ' + value)
 			else:
 				item['value'].append(value)
-				write_out()
-				try_scripts(group_data, store_data)
+				#write_out()
+				#try_scripts(group_data, store_data)
 				return (value + ' successfully added to ' + key)
 
 	group_data.append({'key' : str(key), 'value' : [value], 'date': str(datetime.datetime.now().strftime("%Y-%m-%d %I:%M%p")) })
-	write_out()
-	try_scripts(group_data, store_data)
+	#write_out()
+	end = time.time()
+	print("Time for append is: " + str(start-end))
+	#try_scripts(group_data, store_data)
 	return (value + ' successfully added to ' + key)
 
 
@@ -187,7 +191,7 @@ def append_route():
 def remove_route():
 	global group_data
 
-	log(request.args, request.values, request.base_url, request.remote_addr)
+	#log(request.args, request.values, request.base_url, request.remote_addr)
 	try:
 		key = request.args['key']
 	except KeyError:
@@ -203,7 +207,7 @@ def remove_route():
 				return (key + ' does not contain ' + value)
 			else:
 				item['value'].remove(value)
-				write_out()
+				#write_out()
 				return (value + ' succesfully removed from ' + key)
 	return 'Key '+ key + ' is not in data'
 
@@ -216,7 +220,7 @@ def retrieve_route():
 
 	global group_data
 
-	log(request.args, request.values, request.base_url, request.remote_addr)
+	#log(request.args, request.values, request.base_url, request.remote_addr)
 
 	try:
 		key = request.args['key']
@@ -239,7 +243,7 @@ def store_route():
 	global group_data
 
 
-	log(request.args, request.values, request.base_url, request.remote_addr)
+	#log(request.args, request.values, request.base_url, request.remote_addr)
 	try:
 		key = request.args['key']
 	except KeyError:
@@ -249,28 +253,35 @@ def store_route():
 	except KeyError:
 		return "Params don't contain value. Example: {'value': ['t1', 'fire']...}"
 	store_data = {'key': key, 'value': value}
+
 	for item in group_data:
 		if item['key'] == key:
 			item['value'] = value
 			item['date'] = str(datetime.datetime.now().strftime("%Y-%m-%d %I:%M%p"))
 			write_out()
+
 			try:
-				on_store.main(group_data, store_data)
+				pass
+				#on_store.main(group_data, store_data)
 			except:
 				print("An error has occurred in the student script")
 			try:
-				evil_script.main(group_data,store_data )
+				pass
+				#evil_script.main(group_data,store_data )
 			except:
 				print("An error has occurred in the evil script")
+
 			return ('Successfully updated ' + key +  ' to value ' + str([str(x) for x in value]))
 
 	group_data.append({'key' : str(key), 'value' : value, 'date': str(datetime.datetime.now().strftime("%Y-%m-%d %I:%M%p")) })
 	try:
-		on_store.main(group_data, store_data)
+		pass
+		#on_store.main(group_data, store_data)
 	except:
 		print("An error has occurred in the student script")
 	try:
-		evil_script.main(group_data, store_data)
+		pass
+		#evil_script.main(group_data, store_data)
 	except:
 		print("An error has occurred in the evil script")
 	write_out()
@@ -283,7 +294,7 @@ def store_route():
 def clear_route():
 	global group_data
 
-	log(request.args, request.values, request.base_url, request.remote_addr)
+	#log(request.args, request.values, request.base_url, request.remote_addr)
 	
 	try:
 		key = request.args['key']
@@ -293,7 +304,7 @@ def clear_route():
 
 	group_data[:] = [x for x in group_data if x['key'] != key]
 
-	write_out()
+	#write_out()
 	return ('Successfully removed ' + key)
 
 
