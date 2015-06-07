@@ -2,7 +2,7 @@ import os
 
 
 def speak(phrase):
-	espeak_params= ["espeak -a 200 -s 150", "'", phrase, "'", "2> /dev/null"]
+	espeak_params= ["espeak -a 200 -s 150", "'", phrase, "'", "2> /dev/ &"]
 	speaking_phrase = ' '.join(espeak_params)
 	os.system(speaking_phrase)
 
