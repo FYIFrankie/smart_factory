@@ -81,7 +81,7 @@ try:
 	existing_file.close()
 except:
 	group_data = []
-	#write_out()
+	write_out()
 
 logs = open('log_file.txt', "a")
 logs.close()
@@ -173,15 +173,15 @@ def append_route():
 				return (key + ' already contains ' + value)
 			else:
 				item['value'].append(value)
-				#write_out()
-				#try_scripts(group_data, store_data)
+				write_out()
+				try_scripts(group_data, store_data)
 				return (value + ' successfully added to ' + key)
 
 	group_data.append({'key' : str(key), 'value' : [value], 'date': str(datetime.datetime.now().strftime("%Y-%m-%d %I:%M%p")) })
-	#write_out()
+	write_out()
 	end = time.time()
 	print("Time for append is: " + str(start-end))
-	#try_scripts(group_data, store_data)
+	try_scripts(group_data, store_data)
 	return (value + ' successfully added to ' + key)
 
 
@@ -207,7 +207,7 @@ def remove_route():
 				return (key + ' does not contain ' + value)
 			else:
 				item['value'].remove(value)
-				#write_out()
+				write_out()
 				return (value + ' succesfully removed from ' + key)
 	return 'Key '+ key + ' is not in data'
 
@@ -262,12 +262,12 @@ def store_route():
 
 			try:
 				pass
-				#on_store.main(group_data, store_data)
+				on_store.main(group_data, store_data)
 			except:
 				print("An error has occurred in the student script")
 			try:
 				pass
-				#evil_script.main(group_data,store_data )
+				evil_script.main(group_data,store_data )
 			except:
 				print("An error has occurred in the evil script")
 
@@ -276,12 +276,12 @@ def store_route():
 	group_data.append({'key' : str(key), 'value' : value, 'date': str(datetime.datetime.now().strftime("%Y-%m-%d %I:%M%p")) })
 	try:
 		pass
-		#on_store.main(group_data, store_data)
+		on_store.main(group_data, store_data)
 	except:
 		print("An error has occurred in the student script")
 	try:
 		pass
-		#evil_script.main(group_data, store_data)
+		evil_script.main(group_data, store_data)
 	except:
 		print("An error has occurred in the evil script")
 	write_out()
@@ -304,7 +304,7 @@ def clear_route():
 
 	group_data[:] = [x for x in group_data if x['key'] != key]
 
-	#write_out()
+	write_out()
 	return ('Successfully removed ' + key)
 
 
