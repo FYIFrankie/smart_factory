@@ -4,7 +4,7 @@ from http_access import crossdomain
 import datetime
 import json
 import on_store, evil_script
-import red, blue, purple
+import color_scripts.red, color_scripts.blue, color_scripts.purple
 from file_io import write_out, log_request
 try:
 	import cPickle as pickle
