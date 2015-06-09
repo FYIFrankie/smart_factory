@@ -3,8 +3,8 @@ from threading import Lock
 from http_access import crossdomain
 import datetime
 import json
-import store_scripts.on_store, store_scripts.evil_script
-import color_scripts.red, color_scripts.blue, color_scripts.purple
+import store_scripts.on_store as on_store, store_scripts.evil_script as evil_script
+import color_scripts.red as red, color_scripts.blue as blue, color_scripts.purple as purple
 from file_io import write_out, log_request
 try:
 	import cPickle as pickle
@@ -32,7 +32,7 @@ except:
 
 
 def try_scripts(group_data, store_data):
-	"""Scripts to call after stores of appends to data are made
+	"""Scripts to call after stores or appends to data are made
 
 	Keyword arguments:
 	group_data -- The entire data set that the group currently has stored in the factory
