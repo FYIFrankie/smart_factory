@@ -3,7 +3,7 @@ from threading import Lock
 from http_access import crossdomain
 import datetime
 import json
-import on_store, evil_script
+import store_scripts.on_store, store_scripts.evil_script
 import color_scripts.red, color_scripts.blue, color_scripts.purple
 from file_io import write_out, log_request
 try:
@@ -86,7 +86,7 @@ def page_not_found(e):
 	"""Deafult route for 404 error"""
 	global log_lock
 
-	log_request(request.args, request.values, request.base_url, request.remote_addr, log_lock)
+	#log_request(request.args, request.values, request.base_url, request.remote_addr, log_lock)
 	return 'Your route is incorrect'
 
 @app.route('/append', methods=['GET', 'OPTIONS'])
@@ -126,7 +126,7 @@ def append_route():
 				item['value'].append(value)
 				item['date'] = str(datetime.datetime.now().strftime("%Y-%m-%d %I:%M%p"))
 				write_out(group_data, pickle_lock)
-				# try_scripts(group_data, store_data)
+				#try_scripts(group_data, store_data)
 				return (value + ' successfully added to ' + key)
 
 	# if the key isn't currently in our group data, create it and add the value
@@ -146,7 +146,7 @@ def remove_route():
 	global group_data, log_lock, pickle_lock
 
 	# log the request - currently commented out
-	log_request(request.args, request.values, request.base_url, request.remote_addr, log_lock)
+	#log_request(request.args, request.values, request.base_url, request.remote_addr, log_lock)
 
 	# try to get key from request.args, return help_text if it isn't there
 	try:
@@ -190,7 +190,7 @@ def retrieve_route():
 
 	# log the request - currently commented out
 
-	log_request(request.args, request.values, request.base_url, request.remote_addr, log_lock)
+	#log_request(request.args, request.values, request.base_url, request.remote_addr, log_lock)
 
 	
 	# try to get key from request.args, return help_text if it isn't there
@@ -220,7 +220,7 @@ def store_route():
 	global group_data, log_lock, pickle_lock
 
 	# log the request - currently commented out
-	log_request(request.args, request.values, request.base_url, request.remote_addr, log_lock)
+	#log_request(request.args, request.values, request.base_url, request.remote_addr, log_lock)
 
 	# try to get key from request.args, return help_text if it isn't there
 	try:
@@ -259,7 +259,7 @@ def clear_route():
 	"""Route to remove dictionary from group_data based on key """
 	global group_data, log_lock, pickle_lock
 
-	log_request(request.args, request.values, request.base_url, request.remote_addr, log_lock)
+	#log_request(request.args, request.values, request.base_url, request.remote_addr, log_lock)
 	
 	try:
 		key = request.args['key']
