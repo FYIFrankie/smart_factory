@@ -1,4 +1,4 @@
-from flask_server import *
+from src.flask_server import *
 
 # create log file if it doesn't exist
 logs = open('log_file.txt', "a")
